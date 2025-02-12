@@ -13,8 +13,11 @@ namespace Microsoft.Security.Utilities
     {
         public override string Pattern
         {
-            get => @$"{WellKnownRegexPatterns.PrefixAllBase64}(?<refine>[{WellKnownRegexPatterns.Base64}]{{33}}{RegexNormalizedSignature}[A-P][{WellKnownRegexPatterns.Base64}]{{5}}=){WellKnownRegexPatterns.SuffixAllBase64}";
+            get => (base.Pattern ??= @$"{WellKnownRegexPatterns.PrefixAllBase64}(?<refine>[{WellKnownRegexPatterns.Base64}]{{33}}{RegexNormalizedSignature}[A-P][{WellKnownRegexPatterns.Base64}]{{5}}=){WellKnownRegexPatterns.SuffixAllBase64}");
             protected set => base.Pattern = value;
         }
+
+        public override int CharsToScanBeforeSignature => 33;
+        public override int CharsToScanAfterSignature => 7;
     }
 }

@@ -7,7 +7,7 @@ namespace Microsoft.Security.Utilities
 {
     public abstract class AzureMessagingIdentifiableKey : Azure32ByteIdentifiableKey
     {
-        public override IEnumerable<ulong> ChecksumSeeds => new[]
+        public override IEnumerable<ulong> ChecksumSeeds { get; } = new[]
         {
             IdentifiableMetadata.AzureMessagingSendKeyChecksumSeed,
             IdentifiableMetadata.AzureMessagingListenKeyChecksumSeed,

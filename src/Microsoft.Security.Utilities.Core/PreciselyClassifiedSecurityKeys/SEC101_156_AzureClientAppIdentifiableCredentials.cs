@@ -5,8 +5,9 @@ using System.Collections.Generic;
 
 namespace Microsoft.Security.Utilities
 {
-    public class AadClientAppIdentifiableCredentials : RegexPattern
+    public class AadClientAppIdentifiableCredentials : RegexPattern, IFastScannableKey
     {
+
         public AadClientAppIdentifiableCredentials()
         {
             Id = "SEC101/156";
@@ -15,6 +16,11 @@ namespace Microsoft.Security.Utilities
             Pattern = $"{WellKnownRegexPatterns.PrefixUrlUnreserved}(?<refine>[{WellKnownRegexPatterns.RegexEncodedUrlUnreserved}]{{3}}(7|8)Q~[{WellKnownRegexPatterns.RegexEncodedUrlUnreserved}]{{31,34}}){WellKnownRegexPatterns.SuffixUrlUnreserved}";
             Signatures = new HashSet<string>(new[] { "8Q~", "7Q~" });
         }
+
+        public int CharsToScanBeforeSignature => 3;
+
+        public int CharsToScanAfterSignature => 34;
+
 
         public override Tuple<string, string> GetMatchIdAndName(string match)
         {
@@ -31,5 +37,6 @@ namespace Microsoft.Security.Utilities
             yield return $"yyy7Q~yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy";
             yield return $"zzz8Q~zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzblP";
         }
+
     }
 }

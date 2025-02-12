@@ -11,19 +11,22 @@ namespace Microsoft.Security.Utilities
 {
     public abstract class IdentifiableKey : RegexPattern, IIdentifiableKey
     {
-        public IdentifiableKey()
+        protected IdentifiableKey()
         {
             RotationPeriod = TimeSpan.FromDays(365 * 2);
             DetectionMetadata = DetectionMetadata.Identifiable;
         }
 
-        public string RegexNormalizedSignature => Signatures!.First().Replace("+", "\\+");
+        private string? _regexNormalizedSignature;
+        public string RegexNormalizedSignature => (_regexNormalizedSignature ??= Signatures!.First().Replace("+", "\\+"));
 
         public virtual uint KeyLength => 32;
 
         public virtual bool EncodeForUrl => false;
 
         public abstract IEnumerable<ulong> ChecksumSeeds { get; }
+        public abstract int CharsToScanBeforeSignature { get; }
+        public abstract int CharsToScanAfterSignature { get; }
 
         public override Tuple<string, string>? GetMatchIdAndName(string match)
         {

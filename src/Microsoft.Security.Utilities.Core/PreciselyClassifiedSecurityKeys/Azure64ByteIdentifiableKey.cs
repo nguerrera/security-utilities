@@ -15,8 +15,11 @@ namespace Microsoft.Security.Utilities
 
         public override string Pattern
         {
-            get => $@"{WellKnownRegexPatterns.PrefixAllBase64}(?<refine>[{WellKnownRegexPatterns.Base64}]{{76}}{RegexNormalizedSignature}[{WellKnownRegexPatterns.Base64}]{{5}}[AQgw]==){WellKnownRegexPatterns.SuffixAllBase64}";
+            get => base.Pattern ??= $@"{WellKnownRegexPatterns.PrefixAllBase64}(?<refine>[{WellKnownRegexPatterns.Base64}]{{76}}{RegexNormalizedSignature}[{WellKnownRegexPatterns.Base64}]{{5}}[AQgw]==){WellKnownRegexPatterns.SuffixAllBase64}";
             protected set => base.Pattern = value;
         }
+
+        public override int CharsToScanBeforeSignature => 76;
+        public override int CharsToScanAfterSignature => 8;
     }
 }

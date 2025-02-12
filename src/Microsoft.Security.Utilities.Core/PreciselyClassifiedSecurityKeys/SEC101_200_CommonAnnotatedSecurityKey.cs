@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Security.Utilities
 {
-    public class CommonAnnotatedSecurityKey : RegexPattern
+    public class CommonAnnotatedSecurityKey : RegexPattern, IFastScannableKey
     {
         public CommonAnnotatedSecurityKey()
         {
@@ -16,6 +16,9 @@ namespace Microsoft.Security.Utilities
             Pattern = $"{WellKnownRegexPatterns.PrefixBase62}(?P<refine>[{WellKnownRegexPatterns.Base62}]{{52}}JQQJ9(?:9|D|H)[{WellKnownRegexPatterns.Base62}][A-L][{WellKnownRegexPatterns.Base62}]{{16}}[A-Za-z][{WellKnownRegexPatterns.Base62}]{{7}}(?:[{WellKnownRegexPatterns.Base62}]{{2}}==)?)";
             Signatures = "JQQJ9".ToSet();
         }
+
+        public int CharsToScanBeforeSignature => 52;
+        public int CharsToScanAfterSignature => 31;
 
         public override IEnumerable<string> GenerateTruePositiveExamples()
         {

@@ -33,7 +33,7 @@ namespace Microsoft.Security.Utilities.Benchmarks
         protected abstract IEnumerable<RegexPattern> RegexPatterns { get; }
 
         [Benchmark]
-        public void UseIdentifiableScan()
+        public void UseIdentifiableScan_Rust()
         {
             var masker = new IdentifiableScan(RegexPatterns,
                                               GenerateCorrelatingIds);
@@ -41,6 +41,14 @@ namespace Microsoft.Security.Utilities.Benchmarks
             ScanTestExamples(masker);
         }
 
+        [Benchmark]
+        public void UseIdentifiableScan_CSharp()
+        {
+            var masker = new IdentifiableScan_Managed(RegexPatterns,
+                                              GenerateCorrelatingIds);
+
+            ScanTestExamples(masker);
+        }
 
         [Benchmark]
         public void UseCachedDotNet()
@@ -88,7 +96,11 @@ namespace Microsoft.Security.Utilities.Benchmarks
                     }
                 }
             }
-            Console.WriteLine($"Total matches: {globalCount}");
+
+            if (globalCount != 849)
+            {
+                throw new InvalidOperationException("Wrong number of matches");
+            }
         }
     }
 }

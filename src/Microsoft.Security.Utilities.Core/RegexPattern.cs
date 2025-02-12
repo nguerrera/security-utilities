@@ -9,11 +9,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Microsoft.Security.Utilities;
 
 public class RegexPattern
 {
+    // HACK
+    private static int s_counter;
+    internal int PatternId { get; } = Interlocked.Increment(ref s_counter);
+
     public const string FallbackRedactionToken = "+++";
 
     public RegexPattern(string id,
@@ -40,6 +45,9 @@ public class RegexPattern
         DetectionMetadata = patternMetadata;
     }
 
+    public RegexOptions RegexOptions => m_regexOptions;
+
+    // TODO: The initialization of this hierarchy is a mess. This warning was a hint. :)
 #pragma warning disable CS8618
     protected RegexPattern()
     {

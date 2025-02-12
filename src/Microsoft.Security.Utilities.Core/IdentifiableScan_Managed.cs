@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Microsoft.Security.Utilities;
 
@@ -14,8 +15,6 @@ public sealed class IdentifiableScan_Managed : ISecretMasker, IDisposable
     private bool generateCorrelatingIds;
     private readonly Dictionary<string, IList<RegexPattern>> signatureToPatternsMap;
     private readonly Dictionary<string, ISet<string>> idToSignaturesMap;
-    private IRegexEngine regexEngine;
-    private List<string> orderedIds;
 
     private static readonly ISet<string> HighPerformanceEnabledSignatures = new HashSet<string>(new string[]
         {
@@ -43,26 +42,24 @@ public sealed class IdentifiableScan_Managed : ISecretMasker, IDisposable
     {
         this.signatureToPatternsMap = new Dictionary<string, IList<RegexPattern>>();
         this.idToSignaturesMap = new Dictionary<string, ISet<string>>();
-        this.regexEngine = regexEngine ?? CachedDotNetRegex.Instance;
         this.generateCorrelatingIds = generateCorrelatingIds;
-        this.orderedIds = new List<string>();
 
         foreach (RegexPattern pattern in regexPatterns)
         {
             if (pattern.Signatures == null || pattern.Signatures.Count == 0)
             {
-                throw new NotSupportedException("Not interested in low performance fallback for this experiment.");
+                //throw new NotSupportedException("Not interested in low performance fallback for this experiment.");
                 //PopulateBackupMasker(generateCorrelatingIds);
                 //
                 //this.backupSecretMasker.AddRegex(pattern);
-                //continue;
+                continue;
             }
 
             foreach (string signature in pattern.Signatures)
             {
                 if (!HighPerformanceEnabledSignatures.Contains(signature))
                 {
-                    throw new NotSupportedException("Not interested in low performance fallback for this experiment.");
+                    //throw new NotSupportedException("Not interested in low performance fallback for this experiment.");
                     //PopulateBackupMasker(generateCorrelatingIds);
                 }
 
@@ -88,28 +85,80 @@ public sealed class IdentifiableScan_Managed : ISecretMasker, IDisposable
     {
         if (string.IsNullOrEmpty(input))
         {
-            yield break;
+            return [];
         }
 
-        Range r;
+        var detections = new List<Detection>();
 
-        //// key: signature, value: list of ranges in 
-        //var signatureFinds = new Dictionary<string, Range>(StringComparer.Ordinal);
-        
+        foreach (var pair in this.signatureToPatternsMap)
+        {
+            var (signature, patterns) = (pair.Key, pair.Value); 
 
-        //foreach ()
+            // Find all signatures using IndexOf.
+            int index = 0;
+            var signatureOffsets = new List<int>();
+            do
+            {
+                index = input.IndexOf(signature, index, StringComparison.Ordinal);
+                if (index < 0)
+                {
+                    break;
+                }
+                signatureOffsets.Add(index);
+                index += signature.Length;
+            } while (index < input.Length);
 
+            // 
+            foreach (var pattern in patterns)
+            {
+                var regex = CachedDotNetRegex.GetOrCreateRegex(pattern.PatternId, pattern.Pattern, pattern.RegexOptions);
+                foreach (var signatureOffset in signatureOffsets)
+                {
+                    var identifablePattern = (IFastScannableKey)pattern;
+                    var start = Math.Max(0, signatureOffset - identifablePattern.CharsToScanBeforeSignature);
+                    var end = Math.Min(input.Length, signatureOffset + signature.Length + identifablePattern.CharsToScanAfterSignature);
+                    var length = end - start;
 
-        //// Get indexes and lengths of all substrings that will be replaced.
-        //foreach (RegexPattern regexSecret in pa)
-        //{
-        //    foreach (var detection in regexSecret.GetDetections(input, m_generateCorrelatingIds, DefaultRegexRedactionToken, _regexEngine))
-        //    {
-        //        yield return detection;
-        //    }
-        //}
+                    var rawMatch = regex.Match(input, start, length);
+                    if (!rawMatch.Success)
+                    {
+                        continue;
+                    }
 
-         
+                    var match = CachedDotNetRegex.ToFlex(rawMatch, captureGroup: "refine");
+                    var found = match.Value;
+                    var result = pattern.GetMatchIdAndName(match.Value);
+
+                    if (result != null)
+                    {
+                        string c3id = null;
+                        string preciseId = result.Item1;
+
+                        if (generateCorrelatingIds)
+                        {
+                            c3id = RegexPattern.GenerateCrossCompanyCorrelatingId(found);
+                        }
+
+                        string redactionToken = c3id != null
+                            ? $"{preciseId}:{c3id}"
+                            : RegexPattern.FallbackRedactionToken;
+
+                        detections.Add(
+                            new Detection
+                            {
+                                Id = preciseId,
+                                Name = result.Item2,
+                                Start = start + match.Index,
+                                Length = found.Length,
+                                Metadata = DetectionMetadata.HighEntropy,
+                                CrossCompanyCorrelatingId = c3id,
+                                RedactionToken = redactionToken,
+                            });
+                    }
+                }
+            }
+        }
+        return detections;
     }
 
 

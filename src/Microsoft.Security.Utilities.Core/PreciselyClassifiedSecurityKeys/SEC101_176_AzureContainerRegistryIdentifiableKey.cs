@@ -11,11 +11,11 @@ namespace Microsoft.Security.Utilities
         {
             Id = "SEC101/176";
             Name = nameof(AzureContainerRegistryIdentifiableKey);
+            Signatures = IdentifiableMetadata.AzureContainerRegistrySignature.ToSet();
+            Pattern = @$"{WellKnownRegexPatterns.PrefixAllBase64}(?<refine>[{WellKnownRegexPatterns.Base64}]{{42}}{RegexNormalizedSignature}[A-D][{WellKnownRegexPatterns.Base64}]{{5}}){WellKnownRegexPatterns.SuffixAllBase64}";
         }
 
-        public override ISet<string> Signatures => IdentifiableMetadata.AzureContainerRegistrySignature.ToSet();
-
-        override public IEnumerable<ulong> ChecksumSeeds => new[] { IdentifiableMetadata.AzureContainerRegistryChecksumSeed };
+        override public IEnumerable<ulong> ChecksumSeeds { get; } = [ IdentifiableMetadata.AzureContainerRegistryChecksumSeed ];
 
         public override string Pattern
         {
@@ -24,5 +24,8 @@ namespace Microsoft.Security.Utilities
         }
 
         override public uint KeyLength => 39;
+
+        public override int CharsToScanBeforeSignature => 42;
+        public override int CharsToScanAfterSignature => 6;
     }
 }

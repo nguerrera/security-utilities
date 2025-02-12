@@ -19,26 +19,28 @@ namespace Microsoft.Security.Utilities
 
         internal static TimeSpan DefaultTimeout = TimeSpan.FromMilliseconds(int.MaxValue - 1);
 
-        static CachedDotNetRegex()
-        {
-            RegexCache = new ConcurrentDictionary<Tuple<string, RegexOptions>, Regex>();
-        }
-
         private CachedDotNetRegex()
         {
         }
 
-        internal static ConcurrentDictionary<Tuple<string, RegexOptions>, Regex> RegexCache { get; }
+        private static readonly ConcurrentDictionary<(string pattern, RegexOptions options), Regex> RegexCache = new();
+        private static readonly ConcurrentDictionary<int, Regex> RegexCacheById = new();
 
         public static Regex GetOrCreateRegex(string pattern, RegexOptions options)
         {
             pattern = NormalizeGroupsPattern(pattern);
-            var key = Tuple.Create(pattern, options);
+            options |= RegexOptions.Compiled;
+
 #if NET7_0_OR_GREATER
-            return RegexCache.GetOrAdd(key, _ => new Regex(pattern, options | RegexOptions.Compiled | RegexOptions.NonBacktracking));
-#else
-            return RegexCache.GetOrAdd(key, _ => new Regex(pattern, options | RegexOptions.Compiled));
+            options |= RegexOptions.NonBacktracking;
 #endif
+            return RegexCache.GetOrAdd((pattern, options), k => new Regex(k.pattern, k.options));
+        }
+
+        // HACK
+        internal static Regex GetOrCreateRegex(int patternId, string pattern, RegexOptions options)
+        {
+            return RegexCacheById.GetOrAdd(patternId, _ => GetOrCreateRegex(pattern, options));
         }
 
         public bool IsMatch(string input, string pattern, RegexOptions options = RegexDefaults.DefaultOptionsCaseSensitive, TimeSpan timeout = default, string captureGroup = null)
@@ -95,12 +97,7 @@ namespace Microsoft.Security.Utilities
 
         internal static string NormalizeGroupsPattern(string pattern)
         {
-            if (pattern.IndexOf("?P<") != -1)
-            {
-                return pattern.Replace("?P<", "?<");
-            }
-
-            return pattern;
+            return pattern.Replace("?P<", "?<");
         }
 
         internal static UniversalMatch ToFlex(Match match, string captureGroup = null)

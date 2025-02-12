@@ -5,7 +5,13 @@ using System.Collections.Generic;
 
 namespace Microsoft.Security.Utilities
 {
-    public interface IIdentifiableKey
+    public interface IFastScannableKey
+    {
+        public int CharsToScanBeforeSignature { get; }
+        public int CharsToScanAfterSignature { get; }
+    }
+
+    public interface IIdentifiableKey : IFastScannableKey
     {
         public string Id { get; }
 

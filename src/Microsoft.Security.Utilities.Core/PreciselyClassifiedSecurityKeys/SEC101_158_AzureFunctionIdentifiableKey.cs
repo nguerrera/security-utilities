@@ -27,10 +27,12 @@ namespace Microsoft.Security.Utilities
 
         public override string Pattern
         {
-            get => @$"{WellKnownRegexPatterns.PrefixUrlSafeBase64}(?<refine>[{WellKnownRegexPatterns.RegexEncodedUrlSafeBase64}]{{44}}{Signatures!.First()}[{WellKnownRegexPatterns.RegexEncodedUrlSafeBase64}]{{5}}[AQgw]==){WellKnownRegexPatterns.SuffixUrlSafeBase64}";
+            get => base.Pattern ??= @$"{WellKnownRegexPatterns.PrefixUrlSafeBase64}(?<refine>[{WellKnownRegexPatterns.RegexEncodedUrlSafeBase64}]{{44}}{Signatures!.First()}[{WellKnownRegexPatterns.RegexEncodedUrlSafeBase64}]{{5}}[AQgw]==){WellKnownRegexPatterns.SuffixUrlSafeBase64}";
             protected set => base.Pattern = value;
         }
 
         override public uint KeyLength => 40;
+        public override int CharsToScanBeforeSignature => 44;
+        public override int CharsToScanAfterSignature => 8;
     }
 }

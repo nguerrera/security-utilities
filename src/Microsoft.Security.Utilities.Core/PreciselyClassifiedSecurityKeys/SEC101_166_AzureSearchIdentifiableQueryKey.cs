@@ -28,6 +28,9 @@ namespace Microsoft.Security.Utilities
 
         override public uint KeyLength => 39;
 
+        public override int CharsToScanBeforeSignature => 42;
+        public override int CharsToScanAfterSignature => 6;
+
         public override IEnumerable<string> GenerateTruePositiveExamples()
         {
             foreach (var example in base.GenerateTruePositiveExamples())

@@ -11,10 +11,9 @@ namespace Microsoft.Security.Utilities
         {
             Id = "SEC101/199";
             Name = nameof(AzureEventGridIdentifiableKey);
+            Signatures = IdentifiableMetadata.AzureEventGridSignature.ToSet();
         }
 
-        public override ISet<string> Signatures => IdentifiableMetadata.AzureEventGridSignature.ToSet();
-
-        public override IEnumerable<ulong> ChecksumSeeds => new[] { IdentifiableSecrets.VersionTwoChecksumSeed };
+        public override IEnumerable<ulong> ChecksumSeeds { get; } = new[] { IdentifiableSecrets.VersionTwoChecksumSeed };
     }
 }
