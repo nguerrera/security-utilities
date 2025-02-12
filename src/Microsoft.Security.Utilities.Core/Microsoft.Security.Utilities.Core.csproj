@@ -8,7 +8,7 @@
     <RootNamespace>Microsoft.Security.Utilities.Core</RootNamespace>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" $(TargetFramework) != 'net6.0'">
+  <PropertyGroup Condition=" $(TargetFramework) != 'net8.0'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   

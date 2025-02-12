@@ -74,7 +74,7 @@ if (-not $NoTest) {
 }
 
 Write-Information "Exporting rules data.."
-Invoke-Expression ("$RepoRoot\bld\bin\AnyCPU_Release\Microsoft.Security.Utilities.Cli\net6.0\Microsoft.Security.Utilities.Cli.exe export --output $RepoRoot\GeneratedRegexPatterns\")
+Invoke-Expression ("$RepoRoot\bld\bin\AnyCPU_Release\Microsoft.Security.Utilities.Cli\net8.0\Microsoft.Security.Utilities.Cli.exe export --output $RepoRoot\GeneratedRegexPatterns\")
 if ($LASTEXITCODE -ne 0) {
     Exit-WithFailureMessage $ScriptName "Rules export failed."
 }
@@ -98,8 +98,8 @@ if (-not $NoTest) {
         Exit-WithFailureMessage $ScriptName "Microsoft.Security.Utilities.Core API example execution failed."
     }
 
-    Write-Information "Running API examples using compiled Microsoft.Security.Utilities.Core package on net6.0..."
-    Invoke-Expression "$RepoRoot\src\SecurityUtilitiesPackageReference\SecurityUtilitiesApiUtilizationExample\bin\$Configuration\net6.0\SecurityUtilitiesApiUtilizationExample.exe"
+    Write-Information "Running API examples using compiled Microsoft.Security.Utilities.Core package on net8.0..."
+    Invoke-Expression "$RepoRoot\src\SecurityUtilitiesPackageReference\SecurityUtilitiesApiUtilizationExample\bin\$Configuration\net8.0\SecurityUtilitiesApiUtilizationExample.exe"
     if ($LASTEXITCODE -ne 0) {
         Exit-WithFailureMessage $ScriptName "Microsoft.Security.Utilities.Core API example execution failed."
     }
