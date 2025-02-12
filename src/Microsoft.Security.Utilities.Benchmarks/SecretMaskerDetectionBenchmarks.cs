@@ -8,7 +8,7 @@ namespace Microsoft.Security.Utilities.Benchmarks
     public abstract class SecretMaskerDetectionBenchmarks
     {
         // The # of iterations of the scan to run.
-        protected virtual int Iterations => 10;
+        protected virtual int Iterations => 1;
 
         // The size of randomized data to add as a prefix
         // for every secret. This is intended to make positive
