@@ -2,12 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Microsoft.Security.Utilities;
 
@@ -19,10 +14,8 @@ public sealed class IdentifiableScan_Managed : ISecretMasker, IDisposable
     private bool generateCorrelatingIds;
     private readonly Dictionary<string, IList<RegexPattern>> signatureToPatternsMap;
     private readonly Dictionary<string, ISet<string>> idToSignaturesMap;
-    private SecretMasker backupSecretMasker;
     private IRegexEngine regexEngine;
     private List<string> orderedIds;
-    private IntPtr scan;
 
     private static readonly ISet<string> HighPerformanceEnabledSignatures = new HashSet<string>(new string[]
         {
@@ -98,8 +91,10 @@ public sealed class IdentifiableScan_Managed : ISecretMasker, IDisposable
             yield break;
         }
 
+        Range r;
+
         //// key: signature, value: list of ranges in 
-        var signatureFinds = new Dictionary<string, Range>(StringComparer.Ordinal);
+        //var signatureFinds = new Dictionary<string, Range>(StringComparer.Ordinal);
         
 
         //foreach ()
