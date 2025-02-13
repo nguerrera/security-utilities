@@ -15,14 +15,15 @@ namespace Microsoft.Security.Utilities.Benchmarks
         // hit less concentrated in the profiling.
         protected virtual int SecretPrefixSize => 100 * 1024;
 
-        protected virtual string ScanContentPrefix => GenerateRandomData(SecretPrefixSize);
+        private string? _scanContentPrefix;
+        protected virtual string ScanContentPrefix => (_scanContentPrefix ??= GenerateRandomData(SecretPrefixSize));
 
         private static string GenerateRandomData(int size)
         {
             var random = new Random();
             var data = new byte[size];
             random.NextBytes(data);
-            return Convert.ToBase64String(data);
+            return Convert.ToBase64String(data).Replace("A", "Z").Replace("Q", "Z");
         }
 
         // Whether to generate correlating ids for each match.
