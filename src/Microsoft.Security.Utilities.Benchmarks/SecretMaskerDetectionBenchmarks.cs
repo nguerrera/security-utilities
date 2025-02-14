@@ -42,8 +42,13 @@ namespace Microsoft.Security.Utilities.Benchmarks
                 foreach (string example in pattern.GenerateTruePositiveExamples())
                 {
                     chars.AsSpan()[SecretPrefixSize..].Clear();
-                    example.CopyTo(chars.AsSpan()[SecretPrefixSize..]);
-                    var detections = LowLevelIdentifiableScan.Scan(chars.AsSpan().Slice(0, SecretPrefixSize + example.Length));
+                    example.CopyTo(0, chars,SecretPrefixSize, example.Length);
+#if !NET
+                    var toscan = new string(chars, 0, SecretPrefixSize + example.Length);
+#else
+                    var toscan = chars.AsSpan().Slice(0, SecretPrefixSize + example.Length);
+#endif
+                    var detections = LowLevelSecretScanner.Scan(toscan);
                     if (detections.Count != 1)
                     {
                         throw new InvalidOperationException($"Regex {pattern.Name} failed to detect example {example}");
@@ -68,8 +73,8 @@ namespace Microsoft.Security.Utilities.Benchmarks
                 foreach (string example in pattern.GenerateTruePositiveExamples())
                 {
                     // slight penalty for rust here for UTF8 conversion
-                    bytes.AsSpan()[SecretPrefixSize..].Clear();
-                    Encoding.UTF8.GetBytes(example, bytes.AsSpan()[SecretPrefixSize..]);
+                    Array.Clear(bytes, SecretPrefixSize, example.Length);
+                    Encoding.UTF8.GetBytes(example, 0, example.Length, bytes, SecretPrefixSize);
 
                     var detections = identifiable_scan_oneshot_for_bench(scan, bytes, SecretPrefixSize + example.Length);
                     if (detections != 1)
