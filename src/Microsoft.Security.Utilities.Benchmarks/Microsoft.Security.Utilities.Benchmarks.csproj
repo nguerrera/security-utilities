@@ -16,9 +16,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.Security.Utilities.Core\Microsoft.Security.Utilities.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="D:\Src\FastIdentifiableScan\LowLevelIdentifiableScan.cs" />
-  </ItemGroup>
   
 </Project>
