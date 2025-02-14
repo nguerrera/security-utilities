@@ -176,6 +176,31 @@ fn ffi_string_copy(
 }
 
 #[no_mangle]
+extern "C" fn identifiable_scan_oneshot_for_bench(
+    scan: *mut c_void,
+    input: *const u8,
+    input_len: i32,
+)-> i32 {
+    let mut scan = unsafe { Box::from_raw(scan as *mut IdentifiableScan) };
+    scan.reset();
+
+    let bytes = unsafe { std::slice::from_raw_parts(input, input_len as usize) };
+    scan.parse_bytes(bytes);
+
+    let mut count = 0;
+    for possible_match in scan.possible_matches() {
+        let m = possible_match.matches_bytes(&bytes[(possible_match.start() as usize)..], false);
+        if m.is_some() {
+            count += 1;
+        }
+    }
+
+    /* Don't drop */
+    let _ = Box::into_raw(scan);
+    count
+}
+
+#[no_mangle]
 extern "C" fn identifiable_scan_match_check(
     scan: *mut c_void,
     index: u32,

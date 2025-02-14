@@ -1,5 +1,6 @@
 [
   {
+    "RegexOptions": "None",
     "Pattern": "(?i)\\.servicebus\\.windows.+[^0-9a-z\\/+](?P<refine>[0-9a-z\\/+]{43}=)(?:[^=]|$)",
     "Id": "SEC101/105",
     "Name": "AzureMessageLegacyCredentials",
@@ -9,6 +10,7 @@
     "DetectionMetadata": "ObsoleteFormat, HighEntropy, MediumConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(?:^|[^0-9A-Za-z-_.])e[0-9A-Za-z-_=]{23,}\\.e[0-9A-Za-z-_=]{23,}\\.[0-9A-Za-z-_=]{24,}(?:[^0-9A-Za-z-_]|$)",
     "Id": "SEC101/528",
     "Name": "GenericJwt",
@@ -20,6 +22,7 @@
     "DetectionMetadata": "HighEntropy, MediumConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "($|\\b)(ftps?|https?):\\/\\/(?<refine>[^:@\\/]+:[^:@?\\/]+)@",
     "Id": "SEC101/127",
     "Name": "UrlCredentials",
@@ -30,6 +33,7 @@
     "DetectionMetadata": "MediumConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(?i)(?:^|[?;&])(?:dsas_secret|sig)=(?<refine>[0-9a-z\\/+%]{43,129}(?:=|%3d))",
     "Id": "SEC101/060",
     "Name": "LooseSasSecret",

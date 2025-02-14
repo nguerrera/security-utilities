@@ -1,5 +1,6 @@
 [
   {
+    "RegexOptions": "None",
     "Pattern": "(?:^|[^0-9A-Za-z-_.])e[0-9A-Za-z-_=]{23,}\\.e[0-9A-Za-z-_=]{23,}\\.[0-9A-Za-z-_=]{24,}(?:[^0-9A-Za-z-_]|$)",
     "Id": "SEC101/528",
     "Name": "GenericJwt",
@@ -11,6 +12,7 @@
     "DetectionMetadata": "HighEntropy, MediumConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "($|\\b)(ftps?|https?):\\/\\/(?<refine>[^:@\\/]+:[^:@?\\/]+)@",
     "Id": "SEC101/127",
     "Name": "UrlCredentials",
@@ -21,6 +23,7 @@
     "DetectionMetadata": "MediumConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(?i)(?:^|[?;&])(?:dsas_secret|sig)=(?<refine>[0-9a-z\\/+%]{43,129}(?:=|%3d))",
     "Id": "SEC101/060",
     "Name": "LooseSasSecret",
@@ -31,6 +34,7 @@
     "DetectionMetadata": "HighEntropy, MediumConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(?i)authorization:(\\s|%20)bearer(\\s|%20)(?<refine>[0-9a-z][abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_~.\\-+\\/=]*)([^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_~.\\-+/=]|$)",
     "Id": "SEC101/061",
     "Name": "OAuth2BearerToken",
@@ -41,6 +45,7 @@
     "DetectionMetadata": "LowConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(?i)[a-z0-9.=\\-:[_@\\/*\\]+?]{32}$",
     "Id": "SEC000/003",
     "Name": "Unclassified32CharacterString",
@@ -48,6 +53,7 @@
     "DetectionMetadata": "HighEntropy, Unclassified, LowConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(^|[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+/_\\-])[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+/]{43}=",
     "Id": "SEC000/000",
     "Name": "Unclassified32ByteBase64String",
@@ -55,6 +61,7 @@
     "DetectionMetadata": "HighEntropy, Unclassified, LowConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(^|[^abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+/_\\-])[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+/]{86}==",
     "Id": "SEC000/001",
     "Name": "Unclassified64ByteBase64String",
@@ -62,6 +69,7 @@
     "DetectionMetadata": "HighEntropy, Unclassified, LowConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "^[~.abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_\\-]{34}$",
     "Id": "SEC101/101",
     "Name": "AadClientAppLegacyCredentials",
@@ -69,6 +77,7 @@
     "DetectionMetadata": "ObsoleteFormat, HighEntropy, LowConfidence"
   },
   {
+    "RegexOptions": "None",
     "Pattern": "(^|[^1234567890abcdef])[1234567890abcdef]{32}([^1234567890abcdef]|$)",
     "Id": "SEC000/002",
     "Name": "Unclassified16ByteHexadecimalString",

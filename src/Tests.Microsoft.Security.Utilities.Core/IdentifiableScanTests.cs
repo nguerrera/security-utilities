@@ -1,6 +1,7 @@
 ﻿// Copyright(c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -48,6 +49,31 @@ namespace Tests.Microsoft.Security.Utilities.Core
         }
 
         [TestMethod]
+        public void GenCode()
+        {
+            //foreach (var pattern in WellKnownRegexPatterns.PreciselyClassifiedSecurityKeys.OrderBy(p => p.GetType().Name))
+            //{
+            //    if (pattern is not IFastScannableKey fs)
+            //    {
+            //        continue;
+            //    }
+            //    Console.WriteLine($"/*lang=regex*/public const string {pattern.GetType().Name} = @\"\"\"{pattern.Pattern}\"\"\";");
+            //}
+
+            foreach (var pattern in WellKnownRegexPatterns.PreciselyClassifiedSecurityKeys.OrderBy(p => p.Id))
+            {
+                if (pattern is not IFastScannableKey fs)
+                {
+                    continue;
+                }
+                foreach (var sig in pattern.Signatures)
+                {
+                    Console.WriteLine($"new(\"{pattern.Id}\", \"{sig}\", {fs.CharsToScanBeforeSignature}, {fs.CharsToScanBeforeSignature + sig.Length + fs.CharsToScanAfterSignature}, CompiledRegex.{pattern.GetType().Name}()),");
+                }
+            }
+        }
+
+        [TestMethod]
         public void IdentifiableScan_IdentifiableKeys()
         {
             int iterations = 1000;
@@ -61,6 +87,8 @@ namespace Tests.Microsoft.Security.Utilities.Core
             {
                 var identifiable = pattern as IIdentifiableKey;
                 if (identifiable == null) { continue; }
+
+
 
                 foreach (ulong seed in identifiable.ChecksumSeeds)
                 {
