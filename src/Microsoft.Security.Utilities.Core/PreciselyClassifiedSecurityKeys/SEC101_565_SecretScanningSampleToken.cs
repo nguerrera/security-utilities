@@ -7,12 +7,6 @@ namespace Microsoft.Security.Utilities
 {
     public class SecretScanningSampleToken : RegexPattern
     {
-        /// <summary>
-        /// Detect 32-character Azure Active Directory client application legacy credentials.
-        /// The generated key is a 32-character string that contains alphanumeric characters
-        /// as well as symbols from the set: .=\-:[_@\*]+?
-        /// </summary>
-
         public SecretScanningSampleToken()
         {
             Id = "SEC101/565";

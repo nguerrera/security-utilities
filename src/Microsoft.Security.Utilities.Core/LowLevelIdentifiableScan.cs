@@ -9,6 +9,7 @@ namespace Microsoft.Security.Utilities;
 
 // A whole lot of complexity is added because there's no way to match a regex against a span on .NET Framework. :(
 #if NET
+using System.Buffers;
 using StringOrSpan = System.ReadOnlySpan<char>;
 #else
 using StringOrSpan = string;
