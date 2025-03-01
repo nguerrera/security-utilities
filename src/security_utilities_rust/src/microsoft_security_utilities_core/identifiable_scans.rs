@@ -751,7 +751,11 @@ impl ScanOptions {
                 }
             }
 
-            if &data[52..58] != b"JQQJ99" {
+            if &data[52..57] != b"JQQJ9" {
+                return 0;
+            }
+
+            if data[57] != b'9' && data[57] != b'D' && data[57] != b'H' {
                 return 0;
             }
 
