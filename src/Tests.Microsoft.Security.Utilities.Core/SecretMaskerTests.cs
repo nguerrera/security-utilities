@@ -488,7 +488,7 @@ public class SecretMaskerTests
         using var secretMasker = new SecretMasker();
         secretMasker.AddValue("abcd");
 
-        string result = secretMasker.MaskSecrets(null);
+        string result = secretMasker.MaskSecrets((string)null);
         Assert.AreEqual(string.Empty, result);
 
         result = secretMasker.MaskSecrets(string.Empty);

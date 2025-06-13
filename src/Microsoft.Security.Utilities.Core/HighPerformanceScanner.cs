@@ -11,9 +11,6 @@ using System.Text.RegularExpressions;
 
 #if NET8_0_OR_GREATER
 using System.Buffers;
-using StringInput = System.ReadOnlySpan<char>;
-#else
-using StringInput = string;
 #endif
 
 namespace Microsoft.Security.Utilities;
@@ -127,7 +124,7 @@ internal sealed class HighPerformanceScanner
 
 #if NET8_0_OR_GREATER
         // This API is non-allocating, but only available in .NET 8.0 and later.
-        Regex.ValueMatchEnumerator matches = pattern.ScopedRegex.EnumerateMatches(input.Slice(start, length));
+        Regex.ValueMatchEnumerator matches = pattern.ScopedRegex.EnumerateMatches(input.Span.Slice(start, length));
         if (!matches.MoveNext())
         {
             return false;
@@ -135,7 +132,7 @@ internal sealed class HighPerformanceScanner
         ValueMatch match = matches.Current;
         Debug.Assert(match.Index == 0, "The regex should be anchored to the beginning.");
 #else
-        Match match = pattern.ScopedRegex.Match(input, start, length);
+        Match match = pattern.ScopedRegex.Match(input.String, start, length);
         if (!match.Success)
         {
             return false;
@@ -164,7 +161,7 @@ internal sealed class HighPerformanceScanner
         //  substrings as we do. It uses the 'Teddy' algorithm:
         //  https://github.com/dotnet/runtime/blob/c1fe87ad88532f0e80de3739fe7b215e6e1f8b90/src/libraries/System.Private.CoreLib/src/System/SearchValues/Strings/AsciiStringSearchValuesTeddyBase.cs#L17
         //  https://github.com/BurntSushi/aho-corasick/blob/8d735471fc12f0ca570cead8e17342274fae6331/src/packed/teddy/README.md
-        int offset = input.Slice(index).IndexOfAny(_signatures);
+        int offset = input.Span.Slice(index).IndexOfAny(_signatures);
         if (offset < 0)
         {
             return null;
@@ -181,7 +178,7 @@ internal sealed class HighPerformanceScanner
             // character. We use it to find the next signature start character.
             // Then we must check if there is actually a signature at that
             // location and loop if not.
-            int offset = input.Slice(index).IndexOfAny(_signatureStarts);
+            int offset = input.Span.Slice(index).IndexOfAny(_signatureStarts);
             if (offset < 0)
             {
                 return null;
@@ -190,7 +187,7 @@ internal sealed class HighPerformanceScanner
 #else
             // .NET Framework: Same approach as .NET 8 using plain old
             // string.IndexOfAny for next signature character.
-            index = input.IndexOfAny(_signatureStarts, index);
+            index = input.String.IndexOfAny(_signatureStarts!, index);
             if (index < 0)
             {
                 return null;

@@ -104,6 +104,27 @@ public sealed class SecretMasker : ISecretMasker
     /// <param name="detectionAction">An optional action to perform on each detection.</param>
     public string MaskSecrets(string input, Action<Detection>? detectionAction = null)
     {
+        if (input == null)
+        {
+            return string.Empty;
+        }
+
+        return MaskSecrets(new StringInput(input), detectionAction);
+    }
+
+#if NET
+    public string MaskSecrets(ReadOnlyMemory<char> input, Action<Detection>? detectionAction = null)
+    {
+        if (input.IsEmpty)
+        {
+            return string.Empty;
+        }
+        return MaskSecrets(new StringInput(input), detectionAction);
+    }
+#endif
+
+    private string MaskSecrets(StringInput input, Action<Detection>? detectionAction = null)
+    {
         var stopwatch = Stopwatch.StartNew();
         try
         {
@@ -115,9 +136,9 @@ public sealed class SecretMasker : ISecretMasker
         }
     }
 
-    private string MaskSecretsCore(string input, Action<Detection>? detectionAction)
+    private string MaskSecretsCore(StringInput input, Action<Detection>? detectionAction)
     {
-        if (string.IsNullOrEmpty(input))
+        if (input.Length == 0)
         {
             return string.Empty;
         }
@@ -126,7 +147,7 @@ public sealed class SecretMasker : ISecretMasker
 
         if (detections.Count == 0)
         {
-            return input;
+            return input.ToString();
         }
 
         SortDetectionsForMasking(detections);
@@ -274,6 +295,27 @@ public sealed class SecretMasker : ISecretMasker
 
     public IEnumerable<Detection> DetectSecrets(string input)
     {
+        if (input == null)
+        {
+            return [];
+        }
+        return DetectSecrets(new StringInput(input));
+    }
+
+#if NET
+    public IEnumerable<Detection> DetectSecrets(ReadOnlyMemory<char> input)
+    {
+        return DetectSecrets(new StringInput(input));
+    }
+#endif
+
+    private IEnumerable<Detection> DetectSecrets(StringInput input)
+    {
+        if (input.Length == 0)
+        {
+            return [];
+        }
+
         var stopwatch = Stopwatch.StartNew();
         try
         {
@@ -285,17 +327,12 @@ public sealed class SecretMasker : ISecretMasker
         }
     }
 
-    private List<Detection> DetectSecretsCore(string input)
+    private List<Detection> DetectSecretsCore(StringInput input)
     {
         // NOTE: MinimumSecretLength changes are not protected by the lock. Make
         // sure to read it only once in this method so that a single masking or
         // detection operation does not use more than one value.
         int minimumSecretLength = MinimumSecretLength;
-
-        if (input == null || input.Length < minimumSecretLength)
-        {
-            return [];
-        }
 
         var detections = new List<Detection>();
         SyncObject.EnterReadLock();

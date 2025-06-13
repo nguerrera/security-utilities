@@ -31,15 +31,15 @@ internal sealed class Unclassified32ByteBase64String : RegexPattern
         yield return $"{WellKnownRegexPatterns.RandomBase64(43)}=";
     }
 
-    public override IEnumerable<Detection> GetDetections(string input,
-                                                         bool generateSha256Hashes,
-                                                         string defaultRedactionToken = RegexPattern.FallbackRedactionToken,
-                                                         IRegexEngine? regexEngine = null)
+    internal override IEnumerable<Detection> GetDetections(StringInput input,
+                                                           bool generateSha256Hashes,
+                                                           string defaultRedactionToken = RegexPattern.FallbackRedactionToken,
+                                                          IRegexEngine? regexEngine = null)
     {
+
         foreach (Detection detection in base.GetDetections(input, generateSha256Hashes, defaultRedactionToken, regexEngine))
         {
             string match = input.Substring(detection.Start, detection.Length);
-
 
             if (!object.Equals(azure32ByteIdentifiableKeys.GetDetections(match,
                                                                          generateSha256Hashes,

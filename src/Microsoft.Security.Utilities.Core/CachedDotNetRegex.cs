@@ -52,6 +52,57 @@ namespace Microsoft.Security.Utilities
             }
         }
 
+#if NET
+        public IEnumerable<UniversalMatch> Matches(ReadOnlySpan<char> input, string pattern, RegexOptions? options = null, TimeSpan timeout = default, string captureGroup = null)
+        {
+            if (timeout == default) { timeout = DefaultTimeout; }
+            var w = Stopwatch.StartNew();
+
+            List<UniversalMatch> list = null;
+            Regex regex = GetOrCreateRegex(pattern, options);
+
+            foreach (ValueMatch m in regex.EnumerateMatches(input))
+            {
+                AddMatch(ref list, input, captureGroup, regex, m);
+
+                // Instance Regex.Matches has no overload; check timeout between matches
+                // (MatchesCollection *is* lazily computed).
+                if (w.Elapsed > timeout) { break; }
+            }
+
+            return (IEnumerable<UniversalMatch>)list ?? Array.Empty<UniversalMatch>();
+        }
+
+        private static void AddMatch(ref List<UniversalMatch> list, ReadOnlySpan<char> input, string captureGroup, Regex regex, ValueMatch valueMatch)
+        {
+            UniversalMatch universalMatch;
+            if (captureGroup == null)
+            {
+                universalMatch = new UniversalMatch
+                {
+                    Success = true,
+                    Index = valueMatch.Index,
+                    Length = valueMatch.Length,
+                    Value = input.Slice(valueMatch.Index, valueMatch.Length).ToString()
+                };
+            }
+            else
+            {
+                // https://github.com/dotnet/runtime/issues/73223: There is no
+                // capture group support when matching against a span. So we
+                // rerun the match against a string that is just the match to
+                // get the captures.
+                Match rematch = regex.Match(input.Slice(valueMatch.Index, valueMatch.Length).ToString());
+                Debug.Assert(rematch.Success, "Expected rematch to succeed.");
+                universalMatch = ToFlex(rematch, captureGroup);
+                universalMatch.Index += valueMatch.Index; // Adjust index to match original input span
+            }
+
+            list ??= new();
+            list.Add(universalMatch);
+        }
+#endif
+
         internal static UniversalMatch ToFlex(Match match, string captureGroup = null)
         {
             int index = match.Index;

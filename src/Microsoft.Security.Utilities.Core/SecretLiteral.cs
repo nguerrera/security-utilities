@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Microsoft.Security.Utilities;
 
-public class SecretLiteral
+internal sealed class SecretLiteral
 {
     public const string FallbackRedactionToken = "***";
 
@@ -29,14 +29,14 @@ public class SecretLiteral
 
     public override int GetHashCode() => Value.GetHashCode();
 
-    public IEnumerable<Detection> GetDetections(string input, string redactionToken)
+    public IEnumerable<Detection> GetDetections(StringInput input, string redactionToken)
     {
         if (string.IsNullOrWhiteSpace(redactionToken))
         {
             redactionToken = FallbackRedactionToken;
         }
 
-        if (!string.IsNullOrEmpty(input) && !string.IsNullOrEmpty(Value))
+        if (input.Length > 0 && !string.IsNullOrEmpty(Value))
         {
             int startIndex = 0;
             while (startIndex > -1 &&

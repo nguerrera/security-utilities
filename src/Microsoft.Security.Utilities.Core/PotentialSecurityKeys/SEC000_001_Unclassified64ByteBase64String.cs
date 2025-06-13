@@ -32,10 +32,10 @@ internal sealed class Unclassified64ByteBase64String : RegexPattern
         yield return $"{WellKnownRegexPatterns.RandomBase64(86)}==";
     }
 
-    public override IEnumerable<Detection> GetDetections(string input,
-                                                         bool generateSha256Hashes,
-                                                         string defaultRedactionToken = RegexPattern.FallbackRedactionToken,
-                                                         IRegexEngine? regexEngine = null)
+    internal override IEnumerable<Detection> GetDetections(StringInput input,
+                                                          bool generateSha256Hashes,
+                                                          string defaultRedactionToken = RegexPattern.FallbackRedactionToken,
+                                                          IRegexEngine? regexEngine = null)
     {
         foreach (Detection detection in base.GetDetections(input, generateSha256Hashes, defaultRedactionToken, regexEngine))
         {
